@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <!-- == PACKAGE SPECIFIC SECTION == -->
+    <id>fluent-bit</id>
+    <version>4.0.0</version>
+    <packageSourceUrl>https://github.com/sier/choco-fluent-bit</packageSourceUrl>
+    <owners>Sier</owners>
+    <!-- == SOFTWARE SPECIFIC SECTION == -->
+    <title>fluent-bit (Install)</title>
+    <authors>Chronosphere Inc.</authors>
+    <projectUrl>https://fluentbit.io/</projectUrl>
+    <iconUrl>https://rawcdn.githack.com/sier/choco-fluent-bit/793e1a4a6e5de48ac097536eca55046e254a33a9/icons/fluentbit_logo.png</iconUrl>
+    <copyright>2015-2025 The Fluent Bit Authors. Fluent Bit is a CNCF sub-project under the umbrella of Fluentd</copyright>
+    <licenseUrl>https://docs.fluentbit.io/manual/about/license</licenseUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/fluent/fluent-bit</projectSourceUrl>
+    <docsUrl>https://docs.fluentbit.io/manual</docsUrl>
+    <mailingListUrl>https://www.fluentd.org/newsletter</mailingListUrl>
+    <bugTrackerUrl>https://github.com/fluent/fluent-bit/issues</bugTrackerUrl>
+    <tags>fluent-bit fluentbit fluentd fluent</tags>
+    <summary>Fluent Bit is a super fast, lightweight, and highly scalable logging, metrics, and traces processor and forwarder. It is the preferred choice for cloud and containerized environments.</summary>
+    <description>Fluent Bit is a fast and lightweight telemetry agent
+for logs, metrics, and traces for Linux, macOS, Windows, and BSD family
+operating systems. Fluent Bit has been made with a strong focus on performance to allow
+the collection and processing of telemetry data from different sources without
+complexity.
+
+Features
+High performance: High throughput with low resources consumption
+
+Data parsing
+
+Convert your unstructured messages using our parsers:JSON,Regex,LTSV and Logfmt
+
+Metrics support: Prometheus and OpenTelemetry compatible
+
+Reliability and data integrity
+
+Backpressure handling
+
+Data buffering in memory and file system
+
+Networking
+
+Security: Built-in TLS/SSL support
+
+Asynchronous I/O
+
+Pluggable architecture and extensibility: Inputs,
+Filters and Outputs:
+
+Connect nearly any source to nearly any destination using preexisting plugins
+
+Extensibility:
+
+Write input, filter, or output plugins in the C language
+
+WASM: WASM Filter Plugins orWASM Input Plugins
+
+Write Filters in Lua orOutput plugins in Golang
+
+Monitoring: Expose internal metrics over HTTP
+in JSON and Prometheus format
+
+Stream Processing: Perform data selection
+and transformation using simple SQL queries
+
+Create new streams of data using query results
+
+Aggregation windows
+
+Data analysis and prediction: Timeseries forecasting
+
+Portable: Runs on Linux, macOS, Windows and BSD systems
+
+Fluent Bit, Fluentd and CNCF
+Fluent Bit is a CNCF graduated sub-project
+under the umbrella of Fluentd. Fluent Bit is licensed under
+the terms of the Apache License v2.0.
+
+Fluent Bit was originally created by Eduardo Silva
+and is now sponsored by Chronosphere. As a
+CNCF-hosted project, it is a fully vendor-neutral and community-driven project.
+</description>
+    <releaseNotes>https://fluentbit.io/announcements/</releaseNotes>
+  </metadata>
+  <files>
+    <!-- this section controls what actually gets packaged into the Chocolatey package -->
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
