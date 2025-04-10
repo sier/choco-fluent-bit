@@ -1,10 +1,10 @@
 <p align="center">
-		<picture>
-		  <a href="https://fluentbit.io">	<img src="https://fluentbit.io/images/footer-logo.svg" alt="Fluent Bit" width="450"> </a>
-		</picture>
-    <picture>
-      <a href="https://community.chocolatey.org/packages/fluent-bit/"> <img src="https://chocolatey.org/assets/images/global-shared/logo-square.svg" alt="Chocolatey" width="150"> </a>
-    </picture>
+	<picture>
+		<a href="https://fluentbit.io"><img src="https://fluentbit.io/images/footer-logo.svg" alt="Fluent Bit" width="450"></a>
+	</picture>
+	<picture>
+		<a href="https://community.chocolatey.org/packages/fluent-bit/"> <img src="https://chocolatey.org/assets/images/global-shared/logo-square.svg" alt="Chocolatey" width="150"> </a>
+	</picture>
 </p>
 
 <hr>
