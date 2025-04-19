@@ -1,0 +1,15 @@
+on: pull_request
+
+jobs:
+  install_chocolatey:
+    name: Install Chocolatey
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Chocolatey
+        run: |
+          choco pack --outputdirectory build
+          cd build
+          choco install fluent-bit --source ./ -y
