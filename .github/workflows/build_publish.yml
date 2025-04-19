@@ -1,0 +1,22 @@
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.ps1'
+
+jobs:
+  chocolatey:
+    name: Chocolatey
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build and publish chocolatey package
+        run: |
+          choco pack --outputdirectory build
+          cd build
+          choco push fluent-bit.*.nupkg --source https://push.chocolatey.org/ --api-key ${{ secrets.CHOCOLATEY_API_KEY }}
+        env:
+          CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
