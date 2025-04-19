@@ -22,4 +22,6 @@ if ($key.Count -eq 1) {
   Write-Warning "To prevent accidental data loss, no programs will be uninstalled."
   Write-Warning "Please alert package maintainer the following keys were matched:"
   $key | % {Write-Warning "- $($_.DisplayName)"}
+} else {
+  Write-Warning "An unknown error occurred while uninstalling $packageName."
 }

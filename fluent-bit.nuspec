@@ -8,7 +8,7 @@
     <packageSourceUrl>https://github.com/sier/choco-fluent-bit</packageSourceUrl>
     <owners>Sier</owners>
     <!-- == SOFTWARE SPECIFIC SECTION == -->
-    <title>fluent-bit (Install)</title>
+    <title>fluent-bit</title>
     <authors>Chronosphere Inc.</authors>
     <projectUrl>https://fluentbit.io/</projectUrl>
     <iconUrl>https://rawcdn.githack.com/sier/choco-fluent-bit/793e1a4a6e5de48ac097536eca55046e254a33a9/icons/fluentbit_logo.png</iconUrl>
