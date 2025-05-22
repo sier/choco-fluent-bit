@@ -17,6 +17,7 @@ jobs:
         run: |
           choco pack --outputdirectory build
           cd build
-          choco push fluent-bit.*.nupkg --source https://push.chocolatey.org/ --api-key ${{ secrets.CHOCOLATEY_API_KEY }}
+          $pkg = Get-ChildItem -Filter 'fluent-bit.*.nupkg' | Select-Object -First 1
+          choco push $pkg.FullName --source https://push.chocolatey.org/ --api-key ${{ secrets.CHOCOLATEY_API_KEY }}
         env:
           CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
