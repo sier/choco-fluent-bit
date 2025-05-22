@@ -51,6 +51,9 @@ $ServiceName = "fluent-bit"
 $ExecutablePath = Join-Path -Path $installDir -ChildPath "bin\fluent-bit.exe"
 $ConfigPath = Join-Path -Path $installDir -ChildPath "conf\fluent-bit.conf"
 
+Write-Host "Executable Path: $ExecutablePath"
+Write-Host "Config Path: $ConfigPath"
+
 New-Service $ServiceName -BinaryPathName "`"$ExecutablePath`" -c `"$ConfigPath`"" -StartupType Automatic -Description "This service runs Fluent Bit, a log collector that enables real-time processing and delivery of log data to centralized logging systems."
 Start-Service -Name $ServiceName
 
