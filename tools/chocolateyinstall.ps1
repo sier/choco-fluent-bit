@@ -9,8 +9,8 @@ if ($process) {
 }
 
 $toolsDir   = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-$url        = 'https://packages.fluentbit.io/windows/fluent-bit-4.0.1-win32.exe'
-$url64      = 'https://packages.fluentbit.io/windows/fluent-bit-4.0.1-win64.exe'
+$url        = 'https://packages.fluentbit.io/windows/fluent-bit-4.0.3-win32.exe'
+$url64      = 'https://packages.fluentbit.io/windows/fluent-bit-4.0.3-win64.exe'
 
 $packageArgs = @{
   packageName   = $env:ChocolateyPackageName
@@ -19,9 +19,9 @@ $packageArgs = @{
   url           = $url
   url64bit      = $url64
   softwareName  = 'fluent-bit*'
-  checksum      = '1734f62dd29d7a94390564e08dc8ecb558e7e668d3c2057d158a40166287effd'
+  checksum      = '8739d87cc8ac1c4b776e8458e64f747719f4c38017e97c1e3abfdb90f1cfe801'
   checksumType  = 'sha256'
-  checksum64    = '8a5a72c8cd9fd9ef3ec4238ff322022de9b1714a06610d678288a577dc5da2f5'
+  checksum64    = '6817aecbd4d71679d1b32dcd466d81c2bce80978a6feecc44e037feab5f2f9ab'
   checksumType64= 'sha256'
   silentArgs    = "/S"
   validExitCodes= @(0, 3010, 1641)
