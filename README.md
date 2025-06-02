@@ -1,9 +1,9 @@
 <p align="center">
 	<picture>
-		<a href="https://fluentbit.io"><img src="https://gist.githubusercontent.com/sier/906da293c9647f5856549bd1b1f1650f/raw/c133c4cdffab9b084225cfc5483a36a451863422/footer-logo.svg" alt="Fluent Bit" width="450"></a>
+		<a href="https://fluentbit.io"><img src="https://github.com/user-attachments/assets/92a3da56-7f2d-4b90-9696-c8d078fc77fc" alt="Fluent Bit" width="450"></a>
 	</picture>
 	<picture>
-		<a href="https://community.chocolatey.org/packages/fluent-bit/"> <img src="https://gist.githubusercontent.com/sier/9f8b32d3eb20a3de70a24a71d21cc8be/raw/94db6d48a481b02e1656321b7850027640bebca9/logo-square.svg" alt="Chocolatey" width="150"> </a>
+		<a href="https://community.chocolatey.org/packages/fluent-bit/"> <img src="https://github.com/user-attachments/assets/dcb00ac0-3f89-4616-b458-8da5af618858" alt="Chocolatey" width="150"> </a>
 	</picture>
 </p>
 
