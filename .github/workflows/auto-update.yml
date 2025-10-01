@@ -176,36 +176,64 @@ jobs:
 
       - name: Create Pull Request
         if: steps.check_version.outputs.needs_update == 'True'
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "chore: update fluent-bit to version ${{ steps.check_version.outputs.latest_version }}"
-          title: "Auto-update: Fluent Bit v${{ steps.check_version.outputs.latest_version }}"
-          body: |
-            ## Automated Package Update
-            
-            This PR was automatically created to update the Fluent Bit package to the latest version.
-            
-            ### Changes
-            - **Previous version**: ${{ steps.check_version.outputs.current_version }}
-            - **New version**: ${{ steps.check_version.outputs.latest_version }}
-            - Updated package URLs and checksums
-            - Updated release notes URL
-            
-            ### Checksums
-            - **32-bit**: `${{ steps.checksums.outputs.checksum32 }}`
-            - **64-bit**: `${{ steps.checksums.outputs.checksum64 }}`
-            
-            ### Release Information
-            - 📦 [Package Downloads](https://packages.fluentbit.io/windows/)
-            - 📖 [Release Notes](https://fluentbit.io/announcements/v${{ steps.check_version.outputs.latest_version }}/)
-            
-            ---
-            
-            *This PR was created automatically by the auto-update workflow. Please review the changes before merging.*
-          branch: "auto-update/v${{ steps.check_version.outputs.latest_version }}"
-          delete-branch: true
-          draft: false
+        shell: pwsh
+        run: |
+          $version = "${{ steps.check_version.outputs.latest_version }}"
+          $currentVersion = "${{ steps.check_version.outputs.current_version }}"
+          $checksum32 = "${{ steps.checksums.outputs.checksum32 }}"
+          $checksum64 = "${{ steps.checksums.outputs.checksum64 }}"
+          $branchName = "auto-update/v$version"
+          
+          # Configure git
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          
+          # Create and switch to new branch
+          git checkout -b $branchName
+          
+          # Add and commit changes
+          git add -A
+          git commit -m "chore: update fluent-bit to version $version"
+          
+          # Push branch
+          git push origin $branchName
+          
+          # Create PR using GitHub CLI
+          $prTitle = "Auto-update: Fluent Bit v$version"
+          $prBody = @"
+          ## Automated Package Update
+          
+          This PR was automatically created to update the Fluent Bit package to the latest version.
+          
+          ### Changes
+          - **Previous version**: $currentVersion
+          - **New version**: $version
+          - Updated package URLs and checksums
+          - Updated release notes URL
+          
+          ### Checksums
+          - **32-bit**: ``$checksum32``
+          - **64-bit**: ``$checksum64``
+          
+          ### Release Information
+          - 📦 [Package Downloads](https://packages.fluentbit.io/windows/)
+          - 📖 [Release Notes](https://fluentbit.io/announcements/v$version/)
+          
+          ---
+          
+          *This PR was created automatically by the auto-update workflow. Please review the changes before merging.*
+          "@
+          
+          # Create PR using GitHub CLI
+          $prBodyFile = "pr-body.md"
+          Set-Content -Path $prBodyFile -Value $prBody -Encoding UTF8
+          
+          gh pr create --base main --head $branchName --title $prTitle --body-file $prBodyFile
+          
+          Remove-Item $prBodyFile -ErrorAction SilentlyContinue
+          Write-Host "✅ Pull Request created successfully!" -ForegroundColor Green
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log results
         shell: pwsh
