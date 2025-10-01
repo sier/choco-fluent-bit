@@ -167,8 +167,8 @@ jobs:
           $installContent = $installContent -replace "fluent-bit-\d+\.\d+\.\d+-win64\.exe", "fluent-bit-$newVersion-win64.exe"
           
           # Update checksums
-          $installContent = $installContent -replace "checksum\s*=\s*'[A-F0-9]+'\s*", "checksum      = '$checksum32'"
-          $installContent = $installContent -replace "checksum64\s*=\s*'[A-F0-9]+'\s*", "checksum64    = '$checksum64'"
+          $installContent = $installContent -replace "checksum\s*=\s*'[A-Fa-f0-9]+'\s*", "checksum      = '$checksum32'"
+          $installContent = $installContent -replace "checksum64\s*=\s*'[A-Fa-f0-9]+'\s*", "checksum64    = '$checksum64'"
           
           Set-Content -Path $installPath -Value $installContent -Encoding UTF8
           
