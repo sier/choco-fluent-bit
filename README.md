@@ -54,3 +54,22 @@ To install the package using debug mode:
 ```
 choco install fluent-bit --debug --verbose --source .
 ```
+
+## (Git) Automated Updates to Chocolatey
+
+This repository includes an automated workflow that checks for new Fluent Bit releases every other day and creates pull requests when updates are available. See [AUTO_UPDATE.md](AUTO_UPDATE.md) for details.
+
+### Manual Updates
+
+You can also check for and apply updates manually using the provided PowerShell scripts:
+
+```powershell
+# Check if an update is available
+.\update-package.ps1 -CheckOnly
+
+# Update to the latest version
+.\update-package.ps1
+
+# Test the update logic
+.\test-update-logic.ps1
+```

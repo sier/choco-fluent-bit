@@ -1,0 +1,222 @@
+name: Auto Update Fluent Bit Package
+
+on:
+  schedule:
+    # Run every other day at 6 AM UTC
+    - cron: '0 6 */2 * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  check-and-update:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup PowerShell
+        shell: pwsh
+        run: |
+          # Ensure we have the latest PowerShell modules
+          Install-Module -Name PowerShellGet -Force -AllowClobber
+          
+      - name: Check for new Fluent Bit version
+        id: check_version
+        shell: pwsh
+        run: |
+          # Function to get latest version from Fluent Bit packages site
+          function Get-LatestFluentBitVersion {
+              try {
+                  $response = Invoke-WebRequest -Uri "https://packages.fluentbit.io/windows/" -UseBasicParsing
+                  $content = $response.Content
+                  
+                  # Look for fluent-bit-X.Y.Z-win64.exe pattern
+                  $versionPattern = 'fluent-bit-(\d+\.\d+\.\d+)-win64\.exe'
+                  $versionMatches = [regex]::Matches($content, $versionPattern)
+                  
+                  if ($versionMatches.Count -eq 0) {
+                      Write-Error "No version found in packages site"
+                      return $null
+                  }
+                  
+                  # Get all versions and find the latest
+                  $versions = $versionMatches | ForEach-Object { $_.Groups[1].Value } | Sort-Object { [version]$_ } -Descending
+                  return $versions[0]
+              }
+              catch {
+                  Write-Error "Failed to fetch latest version: $_"
+                  return $null
+              }
+          }
+          
+          # Function to get current version from nuspec file
+          function Get-CurrentVersion {
+              try {
+                  $nuspecContent = Get-Content -Path "fluent-bit.nuspec" -Raw
+                  $versionMatch = [regex]::Match($nuspecContent, '<version>(\d+\.\d+\.\d+)</version>')
+                  if ($versionMatch.Success) {
+                      return $versionMatch.Groups[1].Value
+                  }
+                  else {
+                      Write-Error "Could not find version in nuspec file"
+                      return $null
+                  }
+              }
+              catch {
+                  Write-Error "Failed to read nuspec file: $_"
+                  return $null
+              }
+          }
+          
+          # Get versions
+          $latestVersion = Get-LatestFluentBitVersion
+          $currentVersion = Get-CurrentVersion
+          
+          Write-Host "Latest Fluent Bit version: $latestVersion"
+          Write-Host "Current package version: $currentVersion"
+          
+          if (-not $latestVersion -or -not $currentVersion) {
+              Write-Error "Failed to get version information"
+              exit 1
+          }
+          
+          # Compare versions
+          $needsUpdate = [version]$latestVersion -gt [version]$currentVersion
+          
+          Write-Host "Needs update: $needsUpdate"
+          
+          # Set outputs
+          echo "latest_version=$latestVersion" >> $env:GITHUB_OUTPUT
+          echo "current_version=$currentVersion" >> $env:GITHUB_OUTPUT
+          echo "needs_update=$needsUpdate" >> $env:GITHUB_OUTPUT
+
+      - name: Download and calculate checksums
+        if: steps.check_version.outputs.needs_update == 'True'
+        id: checksums
+        shell: pwsh
+        run: |
+          $version = "${{ steps.check_version.outputs.latest_version }}"
+          $url32 = "https://packages.fluentbit.io/windows/fluent-bit-$version-win32.exe"
+          $url64 = "https://packages.fluentbit.io/windows/fluent-bit-$version-win64.exe"
+          
+          Write-Host "Downloading and calculating checksums for version $version"
+          
+          # Download 32-bit version
+          try {
+              Invoke-WebRequest -Uri $url32 -OutFile "fluent-bit-win32.exe"
+              $checksum32 = (Get-FileHash -Path "fluent-bit-win32.exe" -Algorithm SHA256).Hash
+              Write-Host "32-bit checksum: $checksum32"
+          }
+          catch {
+              Write-Error "Failed to download 32-bit version: $_"
+              exit 1
+          }
+          
+          # Download 64-bit version
+          try {
+              Invoke-WebRequest -Uri $url64 -OutFile "fluent-bit-win64.exe"
+              $checksum64 = (Get-FileHash -Path "fluent-bit-win64.exe" -Algorithm SHA256).Hash
+              Write-Host "64-bit checksum: $checksum64"
+          }
+          catch {
+              Write-Error "Failed to download 64-bit version: $_"
+              exit 1
+          }
+          
+          # Clean up downloaded files
+          Remove-Item "fluent-bit-win32.exe" -ErrorAction SilentlyContinue
+          Remove-Item "fluent-bit-win64.exe" -ErrorAction SilentlyContinue
+          
+          # Set outputs
+          echo "checksum32=$checksum32" >> $env:GITHUB_OUTPUT
+          echo "checksum64=$checksum64" >> $env:GITHUB_OUTPUT
+
+      - name: Update package files
+        if: steps.check_version.outputs.needs_update == 'True'
+        shell: pwsh
+        run: |
+          $newVersion = "${{ steps.check_version.outputs.latest_version }}"
+          $checksum32 = "${{ steps.checksums.outputs.checksum32 }}"
+          $checksum64 = "${{ steps.checksums.outputs.checksum64 }}"
+          
+          Write-Host "Updating package files to version $newVersion"
+          
+          # Update nuspec file
+          $nuspecPath = "fluent-bit.nuspec"
+          $nuspecContent = Get-Content -Path $nuspecPath -Raw
+          
+          # Update version
+          $nuspecContent = $nuspecContent -replace '<version>\d+\.\d+\.\d+</version>', "<version>$newVersion</version>"
+          
+          # Update release notes URL
+          $nuspecContent = $nuspecContent -replace 'https://fluentbit\.io/announcements/v\d+\.\d+\.\d+/', "https://fluentbit.io/announcements/v$newVersion/"
+          
+          Set-Content -Path $nuspecPath -Value $nuspecContent -Encoding UTF8
+          
+          # Update chocolateyinstall.ps1
+          $installPath = "tools\chocolateyinstall.ps1"
+          $installContent = Get-Content -Path $installPath -Raw
+          
+          # Update URLs
+          $installContent = $installContent -replace "fluent-bit-\d+\.\d+\.\d+-win32\.exe", "fluent-bit-$newVersion-win32.exe"
+          $installContent = $installContent -replace "fluent-bit-\d+\.\d+\.\d+-win64\.exe", "fluent-bit-$newVersion-win64.exe"
+          
+          # Update checksums
+          $installContent = $installContent -replace "checksum\s*=\s*'[A-F0-9]+'\s*", "checksum      = '$checksum32'"
+          $installContent = $installContent -replace "checksum64\s*=\s*'[A-F0-9]+'\s*", "checksum64    = '$checksum64'"
+          
+          Set-Content -Path $installPath -Value $installContent -Encoding UTF8
+          
+          Write-Host "Package files updated successfully"
+
+      - name: Create Pull Request
+        if: steps.check_version.outputs.needs_update == 'True'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update fluent-bit to version ${{ steps.check_version.outputs.latest_version }}"
+          title: "Auto-update: Fluent Bit v${{ steps.check_version.outputs.latest_version }}"
+          body: |
+            ## Automated Package Update
+            
+            This PR was automatically created to update the Fluent Bit package to the latest version.
+            
+            ### Changes
+            - **Previous version**: ${{ steps.check_version.outputs.current_version }}
+            - **New version**: ${{ steps.check_version.outputs.latest_version }}
+            - Updated package URLs and checksums
+            - Updated release notes URL
+            
+            ### Checksums
+            - **32-bit**: `${{ steps.checksums.outputs.checksum32 }}`
+            - **64-bit**: `${{ steps.checksums.outputs.checksum64 }}`
+            
+            ### Release Information
+            - 📦 [Package Downloads](https://packages.fluentbit.io/windows/)
+            - 📖 [Release Notes](https://fluentbit.io/announcements/v${{ steps.check_version.outputs.latest_version }}/)
+            
+            ---
+            
+            *This PR was created automatically by the auto-update workflow. Please review the changes before merging.*
+          branch: "auto-update/v${{ steps.check_version.outputs.latest_version }}"
+          delete-branch: true
+          draft: false
+
+      - name: Log results
+        shell: pwsh
+        run: |
+          Write-Host "=== Auto-Update Results ==="
+          Write-Host "Latest version: ${{ steps.check_version.outputs.latest_version }}"
+          Write-Host "Current version: ${{ steps.check_version.outputs.current_version }}"
+          Write-Host "Needs update: ${{ steps.check_version.outputs.needs_update }}"
+          
+          if ("${{ steps.check_version.outputs.needs_update }}" -eq "True") {
+              Write-Host "✅ Update was needed and PR was created"
+          } else {
+              Write-Host "ℹ️ No update needed, package is already up to date"
+          }
