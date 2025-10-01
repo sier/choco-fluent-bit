@@ -141,8 +141,8 @@ function Update-PackageFiles {
         $installContent = $installContent -replace "fluent-bit-\d+\.\d+\.\d+-win64\.exe", "fluent-bit-$Version-win64.exe"
         
         # Update checksums - more specific regex patterns
-        $installContent = $installContent -replace "checksum\s*=\s*'[A-F0-9]+'\s*", "checksum      = '$Checksum32'"
-        $installContent = $installContent -replace "checksum64\s*=\s*'[A-F0-9]+'\s*", "checksum64    = '$Checksum64'"
+        $installContent = $installContent -replace "checksum\s*=\s*'[A-Fa-f0-9]+'\s*", "checksum      = '$Checksum32'"
+        $installContent = $installContent -replace "checksum64\s*=\s*'[A-Fa-f0-9]+'\s*", "checksum64    = '$Checksum64'"
         
         Set-Content -Path $installPath -Value $installContent -Encoding UTF8
         
