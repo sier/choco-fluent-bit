@@ -189,14 +189,14 @@ jobs:
           git config --global user.name "GitHub Action"
           
           # Create and switch to new branch
-          git checkout -b $branchName
+          git checkout -b "$branchName"
           
           # Add and commit changes
           git add -A
           git commit -m "chore: update fluent-bit to version $version"
           
           # Push branch
-          git push origin $branchName
+          git push origin "$branchName"
           
           # Create PR using GitHub CLI
           $prTitle = "Auto-update: Fluent Bit v$version"
@@ -228,7 +228,7 @@ jobs:
           $prBodyFile = "pr-body.md"
           Set-Content -Path $prBodyFile -Value $prBody -Encoding UTF8
           
-          gh pr create --base main --head $branchName --title $prTitle --body-file $prBodyFile
+          gh pr create --base main --head "$branchName" --title "$prTitle" --body-file "$prBodyFile"
           
           Remove-Item $prBodyFile -ErrorAction SilentlyContinue
           Write-Host "✅ Pull Request created successfully!" -ForegroundColor Green
