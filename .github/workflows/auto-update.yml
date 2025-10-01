@@ -235,6 +235,78 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create GitHub Release
+        if: steps.check_version.outputs.needs_update == 'True'
+        shell: pwsh
+        run: |
+          $version = "${{ steps.check_version.outputs.latest_version }}"
+          $currentVersion = "${{ steps.check_version.outputs.current_version }}"
+          $checksum32 = "${{ steps.checksums.outputs.checksum32 }}"
+          $checksum64 = "${{ steps.checksums.outputs.checksum64 }}"
+          
+          # Build the Chocolatey package
+          Write-Host "Building Chocolatey package..." -ForegroundColor Cyan
+          choco pack --outputdirectory build
+          
+          # Find the generated package
+          $packageFile = Get-ChildItem -Path "build" -Filter "fluent-bit.$version.nupkg" | Select-Object -First 1
+          if (-not $packageFile) {
+              Write-Error "Could not find generated package file"
+              exit 1
+          }
+          
+          Write-Host "Found package: $($packageFile.FullName)" -ForegroundColor Green
+          
+          # Create release notes
+          $releaseNotes = @"
+          # Fluent Bit Chocolatey Package v$version
+          
+          This release updates the Fluent Bit Chocolatey package to match upstream version **$version**.
+          
+          ## 📦 Package Information
+          - **Fluent Bit Version**: $version  
+          - **Previous Version**: $currentVersion
+          - **Package File**: ``fluent-bit.$version.nupkg``
+          
+          ## 🔐 Checksums
+          - **32-bit installer**: ``$checksum32``
+          - **64-bit installer**: ``$checksum64``
+          
+          ## 📖 Upstream Release Information
+          - 📦 [Download Page](https://packages.fluentbit.io/windows/)
+          - 📖 [Release Notes](https://fluentbit.io/announcements/v$version/)
+          - 🔗 [Official Website](https://fluentbit.io/)
+          
+          ## 💾 Installation
+          ````
+          choco install fluent-bit
+          ````
+          
+          Or download the ``.nupkg`` file from this release and install locally:
+          ````
+          choco install fluent-bit --source .
+          ````
+          
+          ---
+          
+          *This release was created automatically by the auto-update workflow.*
+          "@
+          
+          $releaseNotesFile = "release-notes.md"
+          Set-Content -Path $releaseNotesFile -Value $releaseNotes -Encoding UTF8
+          
+          # Create the GitHub release with the package as an asset
+          Write-Host "Creating GitHub release v$version..." -ForegroundColor Cyan
+          gh release create "v$version" "$($packageFile.FullName)" `
+            --title "Fluent Bit Chocolatey Package v$version" `
+            --notes-file "$releaseNotesFile" `
+            --latest
+          
+          Remove-Item $releaseNotesFile -ErrorAction SilentlyContinue
+          Write-Host "✅ GitHub release created successfully!" -ForegroundColor Green
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Log results
         shell: pwsh
         run: |
