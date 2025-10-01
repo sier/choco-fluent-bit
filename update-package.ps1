@@ -129,7 +129,7 @@ function Update-PackageFiles {
         # Update release notes URL
         $nuspecContent = $nuspecContent -replace 'https://fluentbit\.io/announcements/v\d+\.\d+\.\d+/', "https://fluentbit.io/announcements/v$Version/"
         
-        Set-Content -Path $nuspecPath -Value $nuspecContent -Encoding UTF8
+        Set-Content -Path $nuspecPath -Value $nuspecContent -Encoding UTF8BOM
         
         # Update chocolateyinstall.ps1
         Write-Host "  Updating chocolateyinstall.ps1..." -ForegroundColor Gray
@@ -141,10 +141,10 @@ function Update-PackageFiles {
         $installContent = $installContent -replace "fluent-bit-\d+\.\d+\.\d+-win64\.exe", "fluent-bit-$Version-win64.exe"
         
         # Update checksums - more specific regex patterns
-        $installContent = $installContent -replace "checksum\s*=\s*'[A-Fa-f0-9]+'\s*", "checksum      = '$Checksum32'"
-        $installContent = $installContent -replace "checksum64\s*=\s*'[A-Fa-f0-9]+'\s*", "checksum64    = '$Checksum64'"
+        $installContent = $installContent -replace "checksum\s*=\s*'[A-Fa-f0-9]+'", "checksum      = '$Checksum32'"
+        $installContent = $installContent -replace "checksum64\s*=\s*'[A-Fa-f0-9]+'", "checksum64    = '$Checksum64'"
         
-        Set-Content -Path $installPath -Value $installContent -Encoding UTF8
+        Set-Content -Path $installPath -Value $installContent -Encoding UTF8BOM
         
         Write-Host "  Package files updated successfully!" -ForegroundColor Green
         Write-Host "  To restore backup: Copy-Item $backupDir\* .\ -Force" -ForegroundColor Yellow
