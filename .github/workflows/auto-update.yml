@@ -156,7 +156,7 @@ jobs:
           # Update release notes URL
           $nuspecContent = $nuspecContent -replace 'https://fluentbit\.io/announcements/v\d+\.\d+\.\d+/', "https://fluentbit.io/announcements/v$newVersion/"
           
-          Set-Content -Path $nuspecPath -Value $nuspecContent -Encoding UTF8
+          Set-Content -Path $nuspecPath -Value $nuspecContent -Encoding UTF8BOM
           
           # Update chocolateyinstall.ps1
           $installPath = "tools\chocolateyinstall.ps1"
@@ -167,10 +167,10 @@ jobs:
           $installContent = $installContent -replace "fluent-bit-\d+\.\d+\.\d+-win64\.exe", "fluent-bit-$newVersion-win64.exe"
           
           # Update checksums
-          $installContent = $installContent -replace "checksum\s*=\s*'[A-Fa-f0-9]+'\s*", "checksum      = '$checksum32'"
-          $installContent = $installContent -replace "checksum64\s*=\s*'[A-Fa-f0-9]+'\s*", "checksum64    = '$checksum64'"
+          $installContent = $installContent -replace "checksum\s*=\s*'[A-Fa-f0-9]+'", "checksum      = '$checksum32'"
+          $installContent = $installContent -replace "checksum64\s*=\s*'[A-Fa-f0-9]+'", "checksum64    = '$checksum64'"
           
-          Set-Content -Path $installPath -Value $installContent -Encoding UTF8
+          Set-Content -Path $installPath -Value $installContent -Encoding UTF8BOM
           
           Write-Host "Package files updated successfully"
 
