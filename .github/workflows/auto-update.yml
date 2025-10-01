@@ -244,6 +244,9 @@ jobs:
           $checksum32 = "${{ steps.checksums.outputs.checksum32 }}"
           $checksum64 = "${{ steps.checksums.outputs.checksum64 }}"
           
+          # Create build directory if it doesn't exist
+          New-Item -ItemType Directory -Path "build" -Force | Out-Null
+          
           # Build the Chocolatey package
           Write-Host "Building Chocolatey package..." -ForegroundColor Cyan
           choco pack --outputdirectory build
